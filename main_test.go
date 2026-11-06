@@ -2,65 +2,72 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		productID      string
-		quantity       int
-		accountBalance float64
-		expected_1     bool
-		expected_2     float64
+		input    []int
+		expected []int
 	}
 
 	runCases := []testCase{
-		{"1", 2, 226.95, true, 223.95},
-		{"2", 25, 459, true, 402.75},
-		{"3", 7, 1185.2, false, 1185.2},
-		{"4", 5, 0, false, 0},
-		{"5", 50, 195, true, 70},
+		{
+			input:    []int{1, 2, 3},
+			expected: []int{1, 3, 6},
+		},
+		{
+			input:    []int{1, 2, 3, 4, 5},
+			expected: []int{1, 3, 6, 10, 15},
+		},
 	}
-
 	submitCases := append(runCases, []testCase{
-		{"6", 0, 100, true, 100},
-		{"7", 1, 210.24, false, 210.24},
-		{"1", 2, 2, false, 2},
-		{"8", 55, 24.5, false, 24.5},
-		{"9", 1, 999.99, true, 0},
+		{
+			input:    []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			expected: []int{1, 3, 6, 10, 15, 21, 28, 36, 45, 55},
+		},
+		{
+			input:    []int{0, 0, 0, 0},
+			expected: []int{0, 0, 0, 0},
+		},
+		{
+			input:    []int{5, -3, -1},
+			expected: []int{5, 2, 1},
+		},
 	}...)
 
 	testCases := runCases
 	if withSubmit {
 		testCases = submitCases
 	}
-	skipped := len(submitCases) - len(testCases)
 
+	skipped := len(submitCases) - len(testCases)
 	passCount := 0
 	failCount := 0
 
 	for _, test := range testCases {
-		output_1, output_2 := placeOrder(
-			test.productID,
-			test.quantity,
-			test.accountBalance,
-		)
-		if output_1 != test.expected_1 || output_2 != test.expected_2 {
+		f := adder()
+		results := make([]int, len(test.input))
+		for i, v := range test.input {
+			results[i] = f(v)
+		}
+		if !slices.Equal(results, test.expected) {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v, %.2f)
-Expecting:  (%v, %.2f)
-Actual:     (%v, %.2f)
+Inputs:     %v
+Expecting:  %v
+Actual:     %v
 Fail
-`, test.productID, test.quantity, test.accountBalance, test.expected_1, test.expected_2, output_1, output_2)
+`, test.input, test.expected, results)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v, %.2f)
-Expecting:  (%v, %.2f)
-Actual:     (%v, %.2f)
+Inputs:     %v
+Expecting:  %v
+Actual:     %v
 Pass
-`, test.productID, test.quantity, test.accountBalance, test.expected_1, test.expected_2, output_1, output_2)
+`, test.input, test.expected, results)
 		}
 	}
 
