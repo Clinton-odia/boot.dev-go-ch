@@ -1,20 +1,21 @@
 package main
 
-import "fmt"
-
-func main() {
-	//monthlyBillIncrease(2, 89, 102)
-	fmt.Printf("%d\n", monthlyBillIncrease(2, 89, 102))
-}
-func monthlyBillIncrease(costPerSend, numLastMonth, numThisMonth int) int {
-	var lastMonthBill int
-	var thisMonthBill int
-	lastMonthBill = getBillForMonth(costPerSend, numLastMonth)
-	thisMonthBill = getBillForMonth(costPerSend, numThisMonth)
-	return thisMonthBill - lastMonthBill
+func main() {}
+func getProductMessage(tier string) string {
+	quantityMsg, priceMsg, _ := getProductInfo(tier)
+	return "You get " + quantityMsg + " for " + priceMsg + "."
 }
 
-func getBillForMonth(costPerSend, messagesSent int) int {
-	bill := costPerSend * messagesSent
-	return bill
+// don't touch below this line
+
+func getProductInfo(tier string) (string, string, string) {
+	if tier == "basic" {
+		return "1,000 texts per month", "$30 per month", "most popular"
+	} else if tier == "premium" {
+		return "50,000 texts per month", "$60 per month", "best value"
+	} else if tier == "enterprise" {
+		return "unlimited texts per month", "$100 per month", "customizable"
+	} else {
+		return "", "", ""
+	}
 }
