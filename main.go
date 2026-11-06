@@ -1,5 +1,10 @@
 package main
 
+// ?
+func main() {}
+
+// don't touch below this line
+
 type User struct {
 	Name string
 	Membership
@@ -10,22 +15,19 @@ type Membership struct {
 	MessageCharLimit int
 }
 
+func (u User) SendMessage(message string, messageLength int) (string, bool) {
+	if messageLength > u.Membership.MessageCharLimit {
+		return "", false
+	}
+	return message, true
+}
 func newUser(name string, membershipType string) User {
-	// ?
+	membership := Membership{Type: membershipType}
 	if membershipType == "premium" {
-		return User{
-			Name: name,
-			Membership: Membership{
-				Type:             membershipType,
-				MessageCharLimit: 1000,
-			},
-		}
+		membership.MessageCharLimit = 1000
+	} else {
+		membership.Type = "standard"
+		membership.MessageCharLimit = 100
 	}
-	return User{
-		Name: name,
-		Membership: Membership{
-			Type:             membershipType,
-			MessageCharLimit: 100,
-		},
-	}
+	return User{Name: name, Membership: membership}
 }
