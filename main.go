@@ -1,11 +1,8 @@
 package main
 
-func main() {}
-
-type messageToSend struct {
-	message   string
-	sender    user
-	recipient user
+type sender struct {
+	rateLimit int
+	user
 }
 
 type user struct {
@@ -13,9 +10,4 @@ type user struct {
 	number int
 }
 
-func canSendMessage(mToSend messageToSend) bool {
-	if mToSend.message != "" && mToSend.sender.name != "" && mToSend.sender.number != 0 && mToSend.recipient.name != "" && mToSend.recipient.number != 0 {
-		return true
-	}
-	return false
-}
+func main() {}
