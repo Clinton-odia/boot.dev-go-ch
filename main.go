@@ -1,58 +1,16 @@
 package main
 
-import (
-	"fmt"
-)
+func main() {}
+func splitEmail(email string) (string, string) {
 
-func bootup() {
-	defer fmt.Println("TEXTIO BOOT DONE") // ?
-	ok := connectToDB()
-	if !ok {
-		return
+	username, domain := "", ""
+
+	for i, r := range email {
+		if r == '@' {
+			username = email[:i]
+			domain = email[i+1:]
+			break
+		}
 	}
-	ok = connectToPaymentProvider()
-	if !ok {
-		return
-	}
-	fmt.Println("All systems ready!")
-}
-
-// don't touch below this line
-
-var shouldConnectToDB = true
-
-func connectToDB() bool {
-	fmt.Println("Connecting to database...")
-	if shouldConnectToDB {
-		fmt.Println("Connected!")
-		return true
-	}
-	fmt.Println("Connection failed")
-	return false
-}
-
-var shouldConnectToPaymentProvider = true
-
-func connectToPaymentProvider() bool {
-	fmt.Println("Connecting to payment provider...")
-	if shouldConnectToPaymentProvider {
-		fmt.Println("Connected!")
-		return true
-	}
-	fmt.Println("Connection failed")
-	return false
-}
-
-func test(dbSuccess, paymentSuccess bool) {
-	shouldConnectToDB = dbSuccess
-	shouldConnectToPaymentProvider = paymentSuccess
-	bootup()
-	fmt.Println("====================================")
-}
-
-func main() {
-	test(true, true)
-	test(false, true)
-	test(true, false)
-	test(false, false)
+	return username, domain
 }
