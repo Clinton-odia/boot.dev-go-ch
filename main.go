@@ -1,33 +1,58 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func printReports(intro, body, outro string) {
-
-	printCostReport(func(s string) int {
-		return len(s) * 2
-	}, intro)
-	printCostReport(func(message string) int {
-		return len(message) * 3
-	}, body)
-	printCostReport(func(message string) int {
-		return len(message) * 4
-	}, outro)
-
+func bootup() {
+	defer fmt.Println("TEXTIO BOOT DONE") // ?
+	ok := connectToDB()
+	if !ok {
+		return
+	}
+	ok = connectToPaymentProvider()
+	if !ok {
+		return
+	}
+	fmt.Println("All systems ready!")
 }
 
 // don't touch below this line
 
-func main() {
-	printReports(
-		"Welcome to the Hotel California",
-		"Such a lovely place",
-		"Plenty of room at the Hotel California",
-	)
+var shouldConnectToDB = true
+
+func connectToDB() bool {
+	fmt.Println("Connecting to database...")
+	if shouldConnectToDB {
+		fmt.Println("Connected!")
+		return true
+	}
+	fmt.Println("Connection failed")
+	return false
 }
 
-func printCostReport(costCalculator func(string) int, message string) {
-	cost := costCalculator(message)
-	fmt.Printf(`Message: "%s" Cost: %v cents`, message, cost)
-	fmt.Println()
+var shouldConnectToPaymentProvider = true
+
+func connectToPaymentProvider() bool {
+	fmt.Println("Connecting to payment provider...")
+	if shouldConnectToPaymentProvider {
+		fmt.Println("Connected!")
+		return true
+	}
+	fmt.Println("Connection failed")
+	return false
+}
+
+func test(dbSuccess, paymentSuccess bool) {
+	shouldConnectToDB = dbSuccess
+	shouldConnectToPaymentProvider = paymentSuccess
+	bootup()
+	fmt.Println("====================================")
+}
+
+func main() {
+	test(true, true)
+	test(false, true)
+	test(true, false)
+	test(false, false)
 }
