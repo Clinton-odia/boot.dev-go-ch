@@ -12,15 +12,14 @@ func Test(t *testing.T) {
 		exYearsUntilDrinking  int
 		exYearsUntilCarRental int
 	}
-
 	runCases := []testCase{
 		{4, 14, 17, 21},
 		{18, 0, 3, 7},
 		{22, 0, 0, 3},
 	}
-
 	submitCases := append(runCases, []testCase{
 		{25, 0, 0, 0},
+		{35, 0, 0, 0},
 	}...)
 
 	testCases := runCases
@@ -29,7 +28,6 @@ func Test(t *testing.T) {
 	}
 
 	skipped := len(submitCases) - len(testCases)
-
 	passCount := 0
 	failCount := 0
 
