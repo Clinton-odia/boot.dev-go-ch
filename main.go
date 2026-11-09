@@ -2,43 +2,53 @@ package main
 
 func main() {}
 
-type formatter interface {
-	format() string
-}
-type plainText struct {
-	message string
-}
-type bold struct {
-	message string
-}
-type code struct {
-	message string
+type notification interface {
+	importance() int
 }
 
-func format(f formatter) string {
-	switch v := f.(type) {
-	case plainText:
-		return v.format()
-	case bold:
-		return v.format()
-	case code:
-		return v.format()
+type directMessage struct {
+	senderUsername string
+	messageContent string
+	priorityLevel  int
+	isUrgent       bool
+}
+
+type groupMessage struct {
+	groupName      string
+	messageContent string
+	priorityLevel  int
+}
+
+type systemAlert struct {
+	alertCode      string
+	messageContent string
+}
+
+// ?
+
+func processNotification(n notification) (string, int) {
+	switch v := n.(type) {
+	case directMessage:
+		return v.senderUsername, v.importance()
+	case groupMessage:
+		return v.groupName, v.importance()
+	case systemAlert:
+		return v.alertCode, v.importance()
 	default:
-		return ""
+		return "", 0
 	}
 }
-func (p plainText) format() string {
-	return p.message
-}
-func (b bold) format() string {
-	return "**" + b.message + "**"
-}
-func (c code) format() string {
-	return "`" + c.message + "`"
+func (dm directMessage) importance() int {
+	if dm.isUrgent {
+		return 50
+	}
+	return dm.priorityLevel
 }
 
-// Don't Touch below this line
+func (gm groupMessage) importance() int {
+	return gm.priorityLevel
+}
 
-func sendMessage(format formatter) string {
-	return format.format() // Adjusted to call Format without an argument
+func (sa systemAlert) importance() int {
+	return 100
 }
