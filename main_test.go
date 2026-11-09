@@ -1,28 +1,26 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
 
-func TestDivide(t *testing.T) {
+func TestValidateStatus(t *testing.T) {
 	type testCase struct {
-		x, y, expected float64
-		expectedErr    string
+		status      string
+		expectedErr error
 	}
 
 	runCases := []testCase{
-		{10, 0, 0, "no dividing by 0"},
-		{10, 2, 5, ""},
-		{15, 30, 0.5, ""},
-		{6, 3, 2, ""},
+		{"", errors.New("status cannot be empty")},
+		{"This is a valid status update that is well within the character limit.", nil},
+		{"This status update is way too long. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.", errors.New("status exceeds 140 characters")},
 	}
 
 	submitCases := append(runCases, []testCase{
-		{0, 10, 0, ""},
-		{100, 0, 0, "no dividing by 0"},
-		{-10, -2, 5, ""},
-		{-10, 2, -5, ""},
+		{"Another valid status.", nil},
+		{"This status update, while derivative, contains exactly one hundred and forty-one characters, which is over the status update character limit.", errors.New("status exceeds 140 characters")},
 	}...)
 
 	testCases := runCases
@@ -31,32 +29,44 @@ func TestDivide(t *testing.T) {
 	}
 
 	skipped := len(submitCases) - len(testCases)
-
 	passCount := 0
 	failCount := 0
 
 	for _, test := range testCases {
-		result, err := divide(test.x, test.y)
-		errString := ""
-		if err != nil {
-			errString = err.Error()
+		err := validateStatus(test.status)
+
+		passed := false
+		if test.expectedErr == nil {
+			passed = (err == nil)
+		} else {
+			passed = (err != nil && err.Error() == test.expectedErr.Error())
 		}
-		if result != test.expected || errString != test.expectedErr {
+
+		expectedStr := "<nil>"
+		if test.expectedErr != nil {
+			expectedStr = test.expectedErr.Error()
+		}
+		actualStr := "<nil>"
+		if err != nil {
+			actualStr = err.Error()
+		}
+
+		if !passed {
 			failCount++
 			t.Errorf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
+Inputs:     %v
+Expecting:  %v
+Actual:     %v
 Fail
-`, test.x, test.y, test.expected, test.expectedErr, result, errString)
+`, test.status, expectedStr, actualStr)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
-Inputs:     (%v, %v)
-Expecting:  (%v, %v)
-Actual:     (%v, %v)
+Inputs:     %v
+Expecting:  %v
+Actual:     %v
 Pass
-`, test.x, test.y, test.expected, test.expectedErr, result, errString)
+`, test.status, expectedStr, actualStr)
 		}
 	}
 
