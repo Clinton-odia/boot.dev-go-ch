@@ -1,33 +1,31 @@
 package main
 
-type employee interface {
-	getName() string
-	getSalary() int
-}
-
-type contractor struct {
-	name         string
-	hourlyPay    int
-	hoursPerYear int
-}
-
 func main() {}
-func (c contractor) getName() string {
-	return c.name
-}
-func (c contractor) getSalary() int {
-	return c.hourlyPay * c.hoursPerYear
-}
-
-type fullTime struct {
-	name   string
-	salary int
+func (e email) cost() int {
+	if e.isSubscribed {
+		return len(e.body) * 2
+	} else {
+		return len(e.body) * 5
+	}
 }
 
-func (ft fullTime) getSalary() int {
-	return ft.salary
+func (e email) format() string {
+	if e.isSubscribed {
+		return "'" + e.body + "' | Subscribed"
+	} else {
+		return "'" + e.body + "' | Not Subscribed"
+	}
 }
 
-func (ft fullTime) getName() string {
-	return ft.name
+type expense interface {
+	cost() int
+}
+
+type formatter interface {
+	format() string
+}
+
+type email struct {
+	isSubscribed bool
+	body         string
 }
