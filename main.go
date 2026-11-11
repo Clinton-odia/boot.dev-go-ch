@@ -1,27 +1,40 @@
 package main
 
-//import "fmt"
+import (
+	//"fmt"
+	"strings"
+)
 
-func isValidPassword(password string) bool {
-	if len(password) >= 5 && len(password) <= 12 {
-		var isCap bool
-		var isDigit bool
-		for _, v := range password {
-
-			if v >= 'A' && v <= 'Z' {
-				isCap = true
-			}
-			if v >= '0' && v <= '9' {
-				isDigit = true
-			}
-
-		}
-		return isCap && isDigit
-
-	}
-	return false
+type sms struct {
+	id      string
+	content string
+	tags    []string
 }
 
-// func main() {
-// 	isValidPassword("Pass123")
-// }
+func tagMessages(messages []sms, tagger func(sms) []string) []sms {
+
+	for i := 0; i < len(messages); i++ {
+		key := i
+		value := messages[key]
+		tags := tagger(value)
+		//fmt.Print(tags)
+		messages[i].tags = append(value.tags, tags...)
+	}
+	return messages
+}
+
+func tagger(msg sms) []string {
+	tags := []string{}
+	if strings.Contains(strings.ToLower(msg.content), "urgent") {
+		tags = append(tags, "Urgent")
+	}
+	if strings.Contains(strings.ToLower(msg.content), "sale") {
+		tags = append(tags, "Promo")
+	}
+	return tags
+}
+
+func main() {
+	//fmt.Print(tagMessages([]sms{{id: "004", content: "Sale! Don't miss out on these urgent promotions!"}}, tagger))
+	//fmt.Print(tagger(sms{id: "004", content: "Sale! Don't miss out on these urgent promotions!"}))
+}
