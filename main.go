@@ -1,46 +1,27 @@
 package main
 
-type Message interface {
-	Type() string
-}
+//import "fmt"
 
-type TextMessage struct {
-	Sender  string
-	Content string
-}
+func isValidPassword(password string) bool {
+	if len(password) >= 5 && len(password) <= 12 {
+		var isCap bool
+		var isDigit bool
+		for _, v := range password {
 
-func (tm TextMessage) Type() string {
-	return "text"
-}
+			if v >= 'A' && v <= 'Z' {
+				isCap = true
+			}
+			if v >= '0' && v <= '9' {
+				isDigit = true
+			}
 
-type MediaMessage struct {
-	Sender    string
-	MediaType string
-	Content   string
-}
-
-func (mm MediaMessage) Type() string {
-	return "media"
-}
-
-type LinkMessage struct {
-	Sender  string
-	URL     string
-	Content string
-}
-
-func (lm LinkMessage) Type() string {
-	return "link"
-}
-
-// Don't touch above this line
-
-func filterMessages(messages []Message, filterType string) []Message {
-	message := []Message{}
-	for _, v := range messages {
-		if v.Type() == filterType {
-			message = append(message, v)
 		}
+		return isCap && isDigit
+
 	}
-	return message
+	return false
 }
+
+// func main() {
+// 	isValidPassword("Pass123")
+// }
