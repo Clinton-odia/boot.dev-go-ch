@@ -2,52 +2,38 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 )
 
 func Test(t *testing.T) {
 	type testCase struct {
-		recipient string
-		text      string
-		expected  string
+		messageIn *string
+		expected  *string
 	}
+	s1 := "English, motherfubber, do you speak it?"
+	s2 := "English, mother****er, do you speak it?"
+	s3 := "Does he look like a witch?"
+	s4 := "Does he look like a *****?"
 
 	runCases := []testCase{
 		{
-			recipient: "Honey Bunny",
-			text:      "I love you, Pumpkin.",
-			expected: `
-To: Honey Bunny
-Message: I love you, Pumpkin.
-`,
+			&s1,
+			&s2,
 		},
 		{
-			recipient: "Pumpkin",
-			text:      "I love you, Honey Bunny.",
-			expected: `
-To: Pumpkin
-Message: I love you, Honey Bunny.
-`,
+			nil,
+			nil,
 		},
 	}
 
 	submitCases := append(runCases, []testCase{
 		{
-			recipient: "poor sap 1",
-			text:      "And you will know My name is the Lord when I lay My vengeance upon thee.",
-			expected: `
-To: poor sap 1
-Message: And you will know My name is the Lord when I lay My vengeance upon thee.
-`,
+			&s3,
+			&s4,
 		},
 		{
-			recipient: "Fabienne",
-			text:      "Zed's dead, baby. Zed's dead.",
-			expected: `
-To: Fabienne
-Message: Zed's dead, baby. Zed's dead.
-`,
+			nil,
+			nil,
 		},
 	}...)
 
@@ -62,32 +48,48 @@ Message: Zed's dead, baby. Zed's dead.
 	failCount := 0
 
 	for _, test := range testCases {
-		m := Message{Recipient: test.recipient, Text: test.text}
-		messageText := getMessageText(m)
-		if strings.TrimSpace(messageText) != strings.TrimSpace(test.expected) {
+		var original *string
+		if test.messageIn != nil {
+			originalVal := *test.messageIn
+			original = &originalVal
+		}
+		removeProfanity(test.messageIn)
+		if test.messageIn != nil &&
+			test.expected != nil &&
+			original != nil &&
+			*test.messageIn != *test.expected {
 			failCount++
 			t.Errorf(`---------------------------------
 Test Failed:
-  input:
-  * Recipient: %v
-  * Text: %v
-  expected:
-  %v
-  actual:
-  %v
-`, m.Recipient, m.Text, test.expected, messageText)
+  input:    %v
+  expected: %v
+  actual:   %v
+`, *original, *test.expected, *test.messageIn)
+		} else if (test.messageIn == nil || test.expected == nil) &&
+			test.messageIn != test.expected {
+			failCount++
+			t.Errorf(`---------------------------------
+Test Failed:
+  input:    %v
+  expected: %v
+  actual:   %v
+`, original, test.expected, test.messageIn)
+		} else if test.messageIn == nil && test.expected == nil {
+			passCount++
+			fmt.Printf(`---------------------------------
+Test Passed:
+  input:    %v
+  expected: %v
+  actual:   %v
+`, original, test.expected, test.messageIn)
 		} else {
 			passCount++
 			fmt.Printf(`---------------------------------
 Test Passed:
-  input:
-  * Recipient: %v
-  * Text: %v
-  expected:
-  %v
-  actual:
-  %v
-`, m.Recipient, m.Text, test.expected, messageText)
+  input:    %v
+  expected: %v
+  actual:   %v
+`, *original, *test.expected, *test.messageIn)
 		}
 	}
 

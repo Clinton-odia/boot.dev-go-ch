@@ -1,22 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"strings"
+)
 
-type Message struct {
-	Recipient string
-	Text      string
-}
+func removeProfanity(message *string) {
+	if message == nil {
+		return
+	}
+	messageVal := *message
 
-func getMessageText(m Message) string {
-	return fmt.Sprintf(`
-To: %v
-Message: %v
-`, m.Recipient, m.Text)
-}
-
-func main() {
-	getMessageText(Message{
-		Recipient: "Clinton",
-		Text:      "hello clinton",
-	})
+	messageVal = strings.ReplaceAll(messageVal, "fubb", "****")
+	messageVal = strings.ReplaceAll(messageVal, "shiz", "****")
+	messageVal = strings.ReplaceAll(messageVal, "witch", "*****")
+	*message = messageVal
 }
