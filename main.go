@@ -1,24 +1,22 @@
 package main
 
-import "errors"
+import "fmt"
 
-func deleteIfNecessary(users map[string]user, name string) (deleted bool, err error) {
-	user, ok := users[name]
-	if ok {
-		if user.scheduledForDeletion {
-			delete(users, name)
-			return true, nil
-		} else {
-			return false, nil
-		}
-	}
-
-	return false, errors.New("not found")
-
+type Message struct {
+	Recipient string
+	Text      string
 }
 
-type user struct {
-	name                 string
-	number               int
-	scheduledForDeletion bool
+func getMessageText(m Message) string {
+	return fmt.Sprintf(`
+To: %v
+Message: %v
+`, m.Recipient, m.Text)
+}
+
+func main() {
+	getMessageText(Message{
+		Recipient: "Clinton",
+		Text:      "hello clinton",
+	})
 }
