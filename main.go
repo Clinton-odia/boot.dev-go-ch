@@ -1,39 +1,28 @@
 package main
 
 import (
-	"errors"
+	"fmt"
+	"time"
 )
 
-type customer struct {
-	id      int
-	balance float64
+func sendEmail(message string) {
+	func() {
+		time.Sleep(time.Millisecond * 250)
+		fmt.Printf("Email received: '%s'\n", message)
+	}()
+	fmt.Printf("Email sent: '%s'\n", message)
 }
 
-type transactionType string
+// Don't touch below this line
 
-const (
-	transactionDeposit    transactionType = "deposit"
-	transactionWithdrawal transactionType = "withdrawal"
-)
-
-type transaction struct {
-	customerID      int
-	amount          float64
-	transactionType transactionType
+func test(message string) {
+	go sendEmail(message)
+	time.Sleep(time.Millisecond * 500)
+	fmt.Println("========================")
 }
 
-// Don't touch above this line
-
-func updateBalance(c *customer, t transaction) error {
-	if t.transactionType == "deposit" {
-		c.balance += t.amount
-	} else if t.transactionType == "withdrawal" {
-		if c.balance < t.amount {
-			return errors.New("insufficient funds")
-		}
-		c.balance -= t.amount
-	} else {
-		return errors.New("unknown transaction type")
-	}
-	return nil
+func main() {
+	test("Hello there Kaladin!")
+	test("Hi there Shallan!")
+	test("Hey there Dalinar!")
 }
