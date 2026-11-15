@@ -5,49 +5,39 @@ import (
 	"testing"
 )
 
-func TestUpdateBalance(t *testing.T) {
+func Test(t *testing.T) {
 	type testCase struct {
-		name            string
-		initialCustomer customer
-		transaction     transaction
-		expectedBalance float64
-		expectError     bool
-		errorMessage    string
+		emails   []string
+		expected int
 	}
 
 	runCases := []testCase{
 		{
-			name:            "Deposit operation",
-			initialCustomer: customer{id: 1, balance: 100.0},
-			transaction:     transaction{customerID: 1, amount: 50.0, transactionType: transactionDeposit},
-			expectedBalance: 150.0,
-			expectError:     false,
+			[]string{
+				"To boldly go where no man has gone before.",
+				"Live long and prosper.",
+			},
+			2,
 		},
 		{
-			name:            "Withdrawal operation",
-			initialCustomer: customer{id: 2, balance: 200.0},
-			transaction:     transaction{customerID: 2, amount: 100.0, transactionType: transactionWithdrawal},
-			expectedBalance: 100.0,
-			expectError:     false,
+			[]string{
+				"The needs of the many outweigh the needs of the few, or the one.",
+				"Change is the essential process of all existence.",
+				"Resistance is futile.",
+			},
+			3,
 		},
 	}
 
 	submitCases := append(runCases, []testCase{
 		{
-			name:            "insufficient funds for withdrawal",
-			initialCustomer: customer{id: 3, balance: 50.0},
-			transaction:     transaction{customerID: 3, amount: 100.0, transactionType: transactionWithdrawal},
-			expectedBalance: 50.0,
-			expectError:     true,
-			errorMessage:    "insufficient funds",
-		},
-		{
-			name:            "unknown transaction type",
-			initialCustomer: customer{id: 4, balance: 100.0},
-			transaction:     transaction{customerID: 4, amount: 50.0, transactionType: "unknown"},
-			expectedBalance: 100.0,
-			expectError:     true,
-			errorMessage:    "unknown transaction type",
+			[]string{
+				"It's life, Jim, but not as we know it.",
+				"Infinite diversity in infinite combinations.",
+				"Make it so.",
+				"Engage!",
+			},
+			4,
 		},
 	}...)
 
@@ -55,47 +45,39 @@ func TestUpdateBalance(t *testing.T) {
 	if withSubmit {
 		testCases = submitCases
 	}
-
 	skipped := len(submitCases) - len(testCases)
 
 	passCount := 0
 	failCount := 0
 
 	for _, test := range testCases {
-		t.Run(test.name, func(t *testing.T) {
-			err := updateBalance(&test.initialCustomer, test.transaction)
-			failureMessage := ""
-
-			if (err != nil) != test.expectError {
-				failureMessage += "Unexpected error presence: expected an error but didn't get one, or vice versa.\n"
-			} else if err != nil && err.Error() != test.errorMessage {
-				failureMessage += "Incorrect error message.\n"
-			}
-
-			if test.initialCustomer.balance != test.expectedBalance {
-				failureMessage += "Balance not updated as expected.\n"
-			}
-
-			if failureMessage != "" {
-				failCount++
-				failureMessage = "FAIL\n" + failureMessage +
-					"Transaction: " + string(test.transaction.transactionType) +
-					fmt.Sprintf(", Amount: %.2f\n", test.transaction.amount) +
-					fmt.Sprintf("Expected balance: %.2f, Actual balance: %.2f", test.expectedBalance, test.initialCustomer.balance)
-				t.Errorf(`---------------------------------
-				%s
-`, failureMessage)
-			} else {
-				passCount++
-				successMessage := "PASSED\n" +
-					"Transaction: " + string(test.transaction.transactionType) +
-					fmt.Sprintf(", Amount: %.2f\n", test.transaction.amount) +
-					fmt.Sprintf("Expected balance: %.2f, Actual balance: %.2f", test.expectedBalance, test.initialCustomer.balance)
-				fmt.Printf(`---------------------------------
-%s
-`, successMessage)
-			}
-		})
+		ch := addEmailsToQueue(test.emails)
+		actual := len(ch)
+		if actual != test.expected {
+			failCount++
+			t.Errorf(`---------------------------------
+Test Failed:
+  emails:
+%v
+  expected channel length: %v
+  actual channel length:   %v
+`,
+				sliceWithBullets(test.emails),
+				test.expected,
+				actual)
+		} else {
+			passCount++
+			fmt.Printf(`---------------------------------
+Test Passed:
+  emails:
+%v
+  expected channel length: %v
+  actual channel length:   %v
+`,
+				sliceWithBullets(test.emails),
+				test.expected,
+				actual)
+		}
 	}
 
 	fmt.Println("---------------------------------")
@@ -104,6 +86,24 @@ func TestUpdateBalance(t *testing.T) {
 	} else {
 		fmt.Printf("%d passed, %d failed\n", passCount, failCount)
 	}
+}
+
+func sliceWithBullets[T any](slice []T) string {
+	if slice == nil {
+		return "  <nil>"
+	}
+	if len(slice) == 0 {
+		return "  []"
+	}
+	output := ""
+	for i, item := range slice {
+		form := "  - %#v\n"
+		if i == (len(slice) - 1) {
+			form = "  - %#v"
+		}
+		output += fmt.Sprintf(form, item)
+	}
+	return output
 }
 
 // withSubmit is set at compile time depending
