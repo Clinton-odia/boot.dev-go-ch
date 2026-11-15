@@ -35,7 +35,7 @@ func Test(t *testing.T) {
 	for _, test := range testCases {
 		sc := safeCounter{
 			counts: make(map[string]int),
-			mu:     &sync.Mutex{},
+			mu:     &sync.RWMutex{},
 		}
 		var wg sync.WaitGroup
 		for i := 0; i < test.count; i++ {
@@ -47,6 +47,8 @@ func Test(t *testing.T) {
 		}
 		wg.Wait()
 
+		sc.mu.RLock()
+		defer sc.mu.RUnlock()
 		if output := sc.val(test.email); output != test.count {
 			failCount++
 			t.Errorf(`---------------------------------
